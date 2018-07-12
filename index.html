@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script src="lib/js/jquery-2.2.4.min.js"></script>
+    <link href="lib/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" /> -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            /*font-family: 'Oswald', sans-serif;*/
+        }
+        ul {
+            padding: 0;
+            margin: 0;
+        }
+        .hide {
+            display: none !important;
+        }
+        #main-svg {
+            height: 600px;
+            width: 100%;
+            background: #eee;
+        }
+        .connector {
+            stroke-width: 2px;
+            stroke: #000;
+        }
+        .r1 {
+            /*width: 200px;
+            height: 70px; */
+            fill: #fff;
+            stroke-width: 1px;
+            stroke: #aaa;
+        }
+        .knot {
+            fill: #fff;
+            stroke-width: 1px;
+            stroke: #aaa;
+        }
+        .cg {
+            transform: translate(100px, 100px);
+        }
+
+        .top-menu {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            background: #000;
+            color: #fff;
+        }
+
+        .top-menu > li {
+            display: inline-block;
+            padding: 10px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .top-menu > li:hover { 
+            /*background: #eee;
+            color: #000;*/
+        }
+
+        .top-menu > li:hover .sublist {
+            display: block;
+        }
+
+        .top-menu .sublist {
+            display: none;
+            list-style: none;
+            position: absolute;
+            left: 0;
+            top: 40px;
+            width: 150px;
+            background: #000;
+            color: #fff;
+        }
+
+        .top-menu .sublist li {
+            padding: 5px 10px;
+        }
+
+        .top-menu .sublist li:hover {
+            background: #00f;
+        }
+
+        .el.selected-el {
+            stroke: blue;
+        }
+    </style>
+</head>
+<body>
+    <ul class="top-menu">
+        <li>File</li>
+        <li>
+            Components
+            <ul class="sublist">
+                <li id="add-component">Add Component</li>
+            </ul>
+        </li>
+        <li>Options</li>
+    </ul>
+
+
+    <svg id="allclonerefs" class="hide">
+        <g id="clone-rec" class="cg">
+            <circle class="knot in el" cx="100px" cy="-5px" r="10px"></circle>
+            <circle class="knot out el" cx="100px" cy="75px" r="10px"></circle>
+            <rect class="r1 el" width="200px" height="70px"></rect>            
+        </g>
+
+        <line id="clone-connector" x1="0" y1="0" x2="200" y2="200" class="connector el"></line>
+    </svg>
+
+    <svg id="main-svg">
+
+    </svg>
+
+    <script>
+        $(function(){
+
+            /*******************************************************
+            * All the things related to INIT
+            *******************************************************/
+            $('#main-svg').css({
+                height: ($(window).height()-100) + 'px'
+            });
+            //////////////////// END OF INIT ////////////////////////
+
+            /*******************************************************
+            * All the things related to ADDING COMPONENT
+            *******************************************************/
+            var componentCount = 0;
+            $('#add-component').click(function(){
+                var newC = $('#clone-rec').clone();
+                newC.attr('id', 'component-'+ (++componentCount));
+                $('#main-svg').append(newC);
+            });
+            ////////////// END OF ADDING COMPONENT //////////////////
+
+
+            /*******************************************************
+            * All the things related to DRAGGING AND REPOSITION
+            *******************************************************/
+            var draggedEl;
+            var prevMousePos = {x: -1, y: -1};
+            
+            $(document).on('mousedown', '.cg', function (ev) {
+                draggedEl = $(this);
+                prevMousePos.x = ev.pageX;
+                prevMousePos.y = ev.pageY;
+            });
+
+            $(document).on('mousemove', function (ev) {
+                if (draggedEl) {
+                    var prevElX = parseInt(draggedEl.css('transform').split(',')[4]);
+                    var prevElY = parseInt(draggedEl.css('transform').split(',')[5]);
+                    var mouseDiffX = ev.pageX - prevMousePos.x;
+                    var mouseDiffY = ev.pageY - prevMousePos.y;
+
+                    var newElX = prevElX + mouseDiffX;
+                    var newElY = prevElY + mouseDiffY;
+
+                    var newCSSTransformVal = "matrix(1, 0, 0, 1, " + newElX + ", " + newElY + ")";
+
+                    $(draggedEl).css('transform', newCSSTransformVal);
+
+                    prevMousePos.x = ev.pageX;
+                    prevMousePos.y = ev.pageY;
+                }
+            });
+
+            $(document).on('mouseup', function () {
+                if (draggedEl && prevMousePos.x > 0 && prevMousePos.y > 0) {
+                    redrawAllConnectors();
+                }
+
+                draggedEl = undefined;
+                prevMousePos = {x: -1, y: -1};
+            });
+            //////////// END OFDRAGGING AND REPOSITION //////////////
+
+
+            /*******************************************************
+            * SELECTING AND JOINING
+            *******************************************************/
+            var prevSelected;
+            //user click on a content should make it selected
+            $(document).on('click', '.el', function (ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                prevSelected = $('.selected-el');
+                prevSelected.removeClass('selected-el');
+                $(this).addClass('selected-el');
+
+                // if an "in" node is clicked 
+                // and prev selected is "out" node
+                // then join them
+                if($(this).hasClass('knot in') && prevSelected.hasClass('knot out')) {
+                    drawRedrawConnectors(prevSelected.closest('.cg'), $(this).closest('.cg'));
+                }
+            });
+
+            //clicking on body should deselect
+            $(document).on('click', function (ev) {
+                $('.selected-el').removeClass('selected-el');
+            });
+
+            // create a path between 2 knots
+            // overwrite if the path already exists
+            // each connector will have an attribute 
+            // data-ftid = "fromID---toID"
+            var connectorCount = 0;
+            function drawRedrawConnectors (fromCom, toCom) {
+                if(!fromCom && !toCom) { return; }
+                var fromX = parseInt(fromCom.css('transform').split(',')[4]) + 100;
+                var fromY = parseInt(fromCom.css('transform').split(',')[5]) + 70;
+
+                var toX = parseInt(toCom.css('transform').split(',')[4]) + 100;
+                var toY = parseInt(toCom.css('transform').split(',')[5]);
+
+                var ftid = fromCom.attr('id') + '---' + toCom.attr('id');
+
+                //remove if existing
+                $('[data-ftid="' + ftid + '"]').remove();
+
+                var newConnector = $('#clone-connector').clone();
+                newConnector.attr({
+                    id: "connector-" + (++connectorCount),
+                    x1: fromX,
+                    y1: fromY,
+                    x2: toX,
+                    y2: toY,
+                    "data-ftid": ftid
+                });
+
+                $('#main-svg').prepend(newConnector);
+            }
+
+            function redrawAllConnectors () {
+                //loop thru all the connectors and redraw
+                var ftids;
+                $('.connector').not('#clone-connector').each(function(){
+                    ftids = $(this).attr('data-ftid').split('---');
+                    drawRedrawConnectors($('#' + ftids[0]), $('#' + ftids[1]));
+                });
+            }
+
+            /////////////////////////////////////////////////////////
+
+            /*******************************************************
+            * DELETING ELEMENTS
+            *******************************************************/
+            $(document).on('keydown', function (e) {
+                //console.log(e.keyCode);
+
+                //if keyboard delete key is pressed
+                if (e.keyCode === 46) {
+                    var selectedEl = $('.selected-el');
+                    if(selectedEl) {
+
+                        // if it is a connector, straight away delete it
+                        if (selectedEl.hasClass('connector')) {
+                            selectedEl.remove();
+                        }
+
+                        // else if it a component, delete the GROUP
+                        else {                            
+                            deleteAllConnectorsConnectedWith(selectedEl.closest('.cg').attr('id'));
+                            selectedEl.closest('.cg').remove();
+                        }
+                    }
+                }
+            });
+
+            // Loop thru each connector
+            // And find and delete all those connectors
+            // that are connected with the supplied componentID
+            function deleteAllConnectorsConnectedWith (comID) {
+                $('.connector').not('#clone-connector').each(function(){
+                    if($(this).attr('data-ftid').split('---').indexOf(comID) >= 0) {
+                        $(this).remove();
+                    }
+                });
+            }
+            ////////////////////////////////////////////////////////
+
+            /*******************************************************
+            * DELETING ELEMENTS
+            *******************************************************/
+            //$('#allclonerefs').remove();
+            ////////////////////////////////////////////////////////
+
+        });
+    </script>
+</body>
+</html>
