@@ -106,8 +106,8 @@
 
     <svg id="allclonerefs" class="hide">
         <g id="clone-rec" class="cg">
-            <circle class="knot in el" cx="100px" cy="-5px" r="10px"></circle>
-            <circle class="knot out el" cx="100px" cy="75px" r="10px"></circle>
+            <circle class="knot in el" cx="100px" cy="-3px" r="6px"></circle>
+            <circle class="knot out el" cx="100px" cy="73px" r="6px"></circle>
             <rect class="r1 el" width="200px" height="70px"></rect>            
         </g>
 
@@ -119,7 +119,19 @@
     </svg>
 
     <script>
-        $(function(){
+        //$(function(){
+
+            /*******************************************************
+            * ALL VARIABLES
+            *******************************************************/
+            var componentCount = 0;
+            var connectorCount = 0;
+            var componentsDB = {};
+            var draggedEl;
+            var prevMousePos = {x: -1, y: -1};
+            var prevSelected;
+
+            //////////////// END OF ALL VARIABLES //////////////////
 
             /*******************************************************
             * All the things related to INIT
@@ -131,21 +143,25 @@
 
             /*******************************************************
             * All the things related to ADDING COMPONENT
-            *******************************************************/
-            var componentCount = 0;
+            *******************************************************/            
             $('#add-component').click(function(){
                 var newC = $('#clone-rec').clone();
-                newC.attr('id', 'component-'+ (++componentCount));
+                var componentID = 'component-'+ (++componentCount);
+                newC.attr('id', componentID);
                 $('#main-svg').append(newC);
+
+                //add the component to componentsDB for future ref
+                componentsDB[componentID] = {
+                    inConnectors: [],
+                    outConnectors: []
+                };
             });
             ////////////// END OF ADDING COMPONENT //////////////////
 
 
             /*******************************************************
             * All the things related to DRAGGING AND REPOSITION
-            *******************************************************/
-            var draggedEl;
-            var prevMousePos = {x: -1, y: -1};
+            *******************************************************/           
             
             $(document).on('mousedown', '.cg', function (ev) {
                 draggedEl = $(this);
@@ -169,12 +185,15 @@
 
                     prevMousePos.x = ev.pageX;
                     prevMousePos.y = ev.pageY;
+
+                    //ALSO NEED TO UPDATE THE CONNECTORS POSITION
+                    repositionAllConnectorConnectedTo(draggedEl.attr('id'), newElX, newElY);
                 }
             });
 
             $(document).on('mouseup', function () {
                 if (draggedEl && prevMousePos.x > 0 && prevMousePos.y > 0) {
-                    redrawAllConnectors();
+                    //redrawAllConnectors();
                 }
 
                 draggedEl = undefined;
@@ -185,8 +204,7 @@
 
             /*******************************************************
             * SELECTING AND JOINING
-            *******************************************************/
-            var prevSelected;
+            *******************************************************/            
             //user click on a content should make it selected
             $(document).on('click', '.el', function (ev) {
                 ev.stopPropagation();
@@ -199,7 +217,7 @@
                 // and prev selected is "out" node
                 // then join them
                 if($(this).hasClass('knot in') && prevSelected.hasClass('knot out')) {
-                    drawRedrawConnectors(prevSelected.closest('.cg'), $(this).closest('.cg'));
+                    drawConnectors(prevSelected.closest('.cg'), $(this).closest('.cg'));
                 }
             });
 
@@ -211,30 +229,37 @@
             // create a path between 2 knots
             // overwrite if the path already exists
             // each connector will have an attribute 
-            // data-ftid = "fromID---toID"
-            var connectorCount = 0;
-            function drawRedrawConnectors (fromCom, toCom) {
+            // data-ftid = "fromID---toID"            
+            function drawConnectors (fromCom, toCom) {
                 if(!fromCom && !toCom) { return; }
-                var fromX = parseInt(fromCom.css('transform').split(',')[4]) + 100;
-                var fromY = parseInt(fromCom.css('transform').split(',')[5]) + 70;
+                var fromX = parseInt(fromCom.css('transform').split(',')[4]) + 103;
+                var fromY = parseInt(fromCom.css('transform').split(',')[5]) + 73;
 
-                var toX = parseInt(toCom.css('transform').split(',')[4]) + 100;
-                var toY = parseInt(toCom.css('transform').split(',')[5]);
+                var toX = parseInt(toCom.css('transform').split(',')[4]) + 103;
+                var toY = parseInt(toCom.css('transform').split(',')[5]) - 3;
 
-                var ftid = fromCom.attr('id') + '---' + toCom.attr('id');
+                var fromID = fromCom.attr('id');
+                var toID = toCom.attr('id');
+
+                var ftid = fromID + '---' + toID;
 
                 //remove if existing
                 $('[data-ftid="' + ftid + '"]').remove();
 
                 var newConnector = $('#clone-connector').clone();
+                var connectorID = "connector-" + (++connectorCount);
                 newConnector.attr({
-                    id: "connector-" + (++connectorCount),
+                    id: connectorID,
                     x1: fromX,
                     y1: fromY,
                     x2: toX,
                     y2: toY,
                     "data-ftid": ftid
                 });
+
+                //update componentsDB
+                componentsDB[fromID].outConnectors.push(connectorID);
+                componentsDB[toID].inConnectors.push(connectorID);
 
                 $('#main-svg').prepend(newConnector);
             }
@@ -244,8 +269,25 @@
                 var ftids;
                 $('.connector').not('#clone-connector').each(function(){
                     ftids = $(this).attr('data-ftid').split('---');
-                    drawRedrawConnectors($('#' + ftids[0]), $('#' + ftids[1]));
+                    drawConnectors($('#' + ftids[0]), $('#' + ftids[1]));
                 });
+            }
+
+            //reposition all the connectors connected to a given ID
+            function repositionAllConnectorConnectedTo (comID, comX, comY) {
+                componentsDB[comID].inConnectors.forEach(function(inConID){
+                    $('#' + inConID).attr({
+                        x2: comX + 103,
+                        y2: comY - 3
+                    });
+                });
+
+                componentsDB[comID].outConnectors.forEach(function(outConID){
+                    $('#' + outConID).attr({
+                        x1: comX + 103,
+                        y1: comY + 73
+                    });
+                })
             }
 
             /////////////////////////////////////////////////////////
@@ -263,12 +305,15 @@
 
                         // if it is a connector, straight away delete it
                         if (selectedEl.hasClass('connector')) {
+                            deleteConnectorFromDB(selectedEl.attr('id'));
                             selectedEl.remove();
                         }
 
                         // else if it a component, delete the GROUP
-                        else {                            
-                            deleteAllConnectorsConnectedWith(selectedEl.closest('.cg').attr('id'));
+                        else {
+                            var comID = selectedEl.closest('.cg').attr('id');
+                            deleteAllConnectorsConnectedWith(comID);
+                            deleteComponentFromDB(comID);
                             selectedEl.closest('.cg').remove();
                         }
                     }
@@ -281,10 +326,24 @@
             function deleteAllConnectorsConnectedWith (comID) {
                 $('.connector').not('#clone-connector').each(function(){
                     if($(this).attr('data-ftid').split('---').indexOf(comID) >= 0) {
+                        deleteConnectorFromDB($(this).attr('id'));
                         $(this).remove();
                     }
                 });
             }
+
+            function deleteComponentFromDB (comID) {
+                delete componentsDB[comID];
+            }
+
+            function deleteConnectorFromDB (connectorID) {
+                //each connector has a data-ftid which stores
+                // from comID---toID
+                var ftids = $('#' + connectorID).attr('data-ftid').split('---');
+
+                componentsDB[ftids[0]] && componentsDB[ftids[0]].outConnectors.splice(componentsDB[ftids[0]].outConnectors.indexOf(connectorID), 1);
+                componentsDB[ftids[1]] && componentsDB[ftids[1]].inConnectors.splice(componentsDB[ftids[1]].inConnectors.indexOf(connectorID), 1);
+            } 
             ////////////////////////////////////////////////////////
 
             /*******************************************************
@@ -293,7 +352,7 @@
             //$('#allclonerefs').remove();
             ////////////////////////////////////////////////////////
 
-        });
+        //});
     </script>
 </body>
 </html>
