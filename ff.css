@@ -1,0 +1,83 @@
+body {
+    margin: 0;
+    padding: 0;
+    /*font-family: 'Oswald', sans-serif;*/
+}
+ul {
+    padding: 0;
+    margin: 0;
+}
+.hide {
+    display: none !important;
+}
+#main-svg {
+    height: 600px;
+    width: 100%;
+    background: #eee;
+}
+.connector {
+    stroke-width: 2px;
+    stroke: #000;
+}
+.r1 {
+    /*width: 200px;
+    height: 70px; */
+    fill: #fff;
+    stroke-width: 1px;
+    stroke: #aaa;
+}
+.knot {
+    fill: #fff;
+    stroke-width: 1px;
+    stroke: #aaa;
+}
+.cg {
+    transform: translate(100px, 100px);
+}
+
+.top-menu {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: #000;
+    color: #fff;
+}
+
+.top-menu > li {
+    display: inline-block;
+    padding: 10px;
+    font-weight: bold;
+    position: relative;
+}
+
+.top-menu > li:hover { 
+    /*background: #eee;
+    color: #000;*/
+}
+
+.top-menu > li:hover .sublist {
+    display: block;
+}
+
+.top-menu .sublist {
+    display: none;
+    list-style: none;
+    position: absolute;
+    left: 0;
+    top: 40px;
+    width: 150px;
+    background: #000;
+    color: #fff;
+}
+
+.top-menu .sublist li {
+    padding: 5px 10px;
+}
+
+.top-menu .sublist li:hover {
+    background: #00f;
+}
+
+.el.selected-el {
+    stroke: blue;
+}
