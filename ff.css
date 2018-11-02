@@ -1,0 +1,139 @@
+* {
+	box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    /*font-family: 'Oswald', sans-serif;*/
+}
+ul {
+    padding: 0;
+    margin: 0;
+}
+.hide {
+    display: none !important;
+}
+.no-select{
+    -webkit-user-select: none; /* Safari 3.1+ */
+    -moz-user-select: none; /* Firefox 2+ */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* Standard syntax */
+}
+.full-mask {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(0,0,0,.7);
+	z-index: 999;
+	display: none;
+}
+.popup {
+	width: 100%;
+	max-width: 500px;
+	min-height: 300px;
+	background: #fff;
+	position: relative;
+	margin: 100px auto;
+}
+.popup .header {
+	height: 30px;
+	background: #000065;
+	color: #fff;
+	padding: 5px 10px;
+	font-weight: bold;
+}
+.popup .close-icon {
+	color: #fff;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	font-weight: bold;
+	display: inline-block;
+	padding: 5px 12px;
+	cursor: pointer;
+}
+.popup .close-icon:hover {
+	background: #f00;
+}
+.popup .body {
+	padding: 5px 10px;
+}
+.popup .body .ip-op {
+	width: 100%;
+	height: 225px;
+	resize: none;
+}
+#main-svg {
+    height: 600px;
+    width: 100%;
+    background: #eee;
+}
+.connector {
+    stroke-width: 2px;
+    stroke: #000;
+}
+.r1 {
+    /*width: 200px;
+    height: 70px; */
+    fill: #fff;
+    stroke-width: 1px;
+    stroke: #aaa;
+}
+.knot {
+    fill: #fff;
+    stroke-width: 1px;
+    stroke: #aaa;
+}
+.cg {
+    transform: translate(100px, 100px);
+}
+
+.top-menu {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: #000;
+    color: #fff;
+}
+
+.top-menu > li {
+    display: inline-block;
+    padding: 10px;
+    font-weight: bold;
+    position: relative;
+	cursor: pointer;
+}
+
+.top-menu > li:hover { 
+    /*background: #eee;
+    color: #000;*/
+}
+
+.top-menu > li:hover .sublist {
+    display: block;
+}
+
+.top-menu .sublist {
+    display: none;
+    list-style: none;
+    position: absolute;
+    left: 0;
+    top: 40px;
+    width: 150px;
+    background: #000;
+    color: #fff;
+}
+
+.top-menu .sublist li {
+    padding: 5px 10px;
+}
+
+.top-menu .sublist li:hover {
+    background: #00f;
+}
+
+.el.selected-el {
+    stroke: blue;
+}

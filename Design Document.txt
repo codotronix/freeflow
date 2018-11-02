@@ -1,0 +1,7 @@
+Design Document for FreeFlow
+Author: Suman Barick
+-------------------------------------
+
+
+1. primary building blocks are rectangles and connectors
+2. 
