@@ -28,6 +28,8 @@
         var newC = $('#clone-rec').clone();
         var componentID = 'component-'+ (++componentCount);
         newC.attr('id', componentID);
+		var newCSSTransformVal = "matrix(1, 0, 0, 1, " + (70 + Math.random()*30) + ", " + (70 + Math.random()*30) + ")";
+		newC.css('transform', newCSSTransformVal);
         $('#main-svg').append(newC);
 
         //add the component to componentsDB for future ref
@@ -230,21 +232,36 @@
     * EXPORTING / CREATING JSON
     *******************************************************/
     $('#btn-export').on('click', function(){
-        exportJSON = {};
-        exportJSON.components = [];
-        //Loop thru all the components and collect them
-        $('.cg').each(function(){
-            var comp = {};
-            comp.id = $(this).attr('id');
-            comp.styleClass = $(this).attr('class');
-            comp.style = $(this).attr('style');
-
-            exportJSON.components.push(comp);
-
-        });
-
-        console.log(exportJSON);
+        //we already have componentsDB containing all the components
+		for (var cid in componentsDB) {
+			componentsDB[cid].transformMatrix = $('#' + cid).attr('style');
+		}
+		
+		$('.full-mask .popup .ip-op').val(JSON.stringify(componentsDB));
+		showPopup({headerMsg: "Exported as JSON"});
+		//console.log(componentsDB);
     });
     ////////////////////////////////////////////////////////
+	
+	
+	/*********************************************************
+	* POPUP AND MODAL
+	*********************************************************/
+	$('body').on('click', '.popup .close-icon', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		$(this).closest('.full-mask').hide();
+	})
+	
+	/*
+	* popupCfg = {
+			headerMsg: ""
+		}
+	*/
+	function showPopup (popupCfg) {
+		$('.full-mask .popup .header').text(popupCfg.headerMsg);
+		$('.full-mask').show();
+	}
+	//////////////////////////////////////////////////////////
 
 //});
