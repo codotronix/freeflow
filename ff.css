@@ -1,3 +1,6 @@
+* {
+	box-sizing: border-box;
+}
 body {
     margin: 0;
     padding: 0;
@@ -9,6 +12,58 @@ ul {
 }
 .hide {
     display: none !important;
+}
+.no-select{
+    -webkit-user-select: none; /* Safari 3.1+ */
+    -moz-user-select: none; /* Firefox 2+ */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* Standard syntax */
+}
+.full-mask {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(0,0,0,.7);
+	z-index: 999;
+	display: none;
+}
+.popup {
+	width: 100%;
+	max-width: 500px;
+	min-height: 300px;
+	background: #fff;
+	position: relative;
+	margin: 100px auto;
+}
+.popup .header {
+	height: 30px;
+	background: #000065;
+	color: #fff;
+	padding: 5px 10px;
+	font-weight: bold;
+}
+.popup .close-icon {
+	color: #fff;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	font-weight: bold;
+	display: inline-block;
+	padding: 5px 12px;
+	cursor: pointer;
+}
+.popup .close-icon:hover {
+	background: #f00;
+}
+.popup .body {
+	padding: 5px 10px;
+}
+.popup .body .ip-op {
+	width: 100%;
+	height: 225px;
+	resize: none;
 }
 #main-svg {
     height: 600px;
@@ -48,6 +103,7 @@ ul {
     padding: 10px;
     font-weight: bold;
     position: relative;
+	cursor: pointer;
 }
 
 .top-menu > li:hover { 
