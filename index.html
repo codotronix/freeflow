@@ -11,18 +11,21 @@
     </style>
 </head>
 <body>
-    <ul class="top-menu">
-        <li>File</li>
+
+	<!-- ************************* TOP MENU REGION *************************************** -->
+    <ul class="top-menu no-select">
         <li>
-            Components
-            <ul class="sublist">
+			File
+			<ul class="sublist">
                 <li id="add-component">Add Component</li>
+				<li id="btn-export">Export</li>
             </ul>
-        </li>
-        <li id="btn-export">Export</li>
+		</li>        
     </ul>
+	<!-- ********************************************************************************** -->
 
-
+	
+	<!-- ************* ALL THE DUMMY CLONING ITEMS *************************************** -->
     <svg id="allclonerefs" class="hide">
         <g id="clone-rec" class="cg">
             <circle class="knot in el" cx="100px" cy="-3px" r="6px"></circle>
@@ -32,11 +35,26 @@
 
         <line id="clone-connector" x1="0" y1="0" x2="200" y2="200" class="connector el"></line>
     </svg>
+	<!-- ********************************************************************************** -->
 
-    <svg id="main-svg">
-
-    </svg>
-
+	
+	<!-- ********************* The DRAWING AREA ******************************************* -->
+    <svg id="main-svg"></svg>
+	<!-- ********************************************************************************** -->
+	
+	
+	<!-- ********************* The POPUP AREA ******************************************* -->
+	<div class="full-mask">
+		<div class="popup">
+			<span class="close-icon">X</span>
+			<div class="header"></div>
+			<div class="body">
+				<textarea class="ip-op"></textarea>
+			</div>
+		</div>
+	</div>
+	<!-- ******************************************************************************** -->
+	
     <script src="ff.js"></script>
 </body>
 </html>
