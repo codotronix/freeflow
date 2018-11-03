@@ -17,7 +17,7 @@
     * All the things related to INIT
     *******************************************************/
     $('#main-svg').css({
-        height: ($(window).height()-100) + 'px'
+        //height: ($(window).height()-100) + 'px'
     });
     //////////////////// END OF INIT ////////////////////////
 
@@ -114,6 +114,9 @@
     // data-ftid = "fromID---toID"            
     function drawConnectors (fromCom, toCom) {
         if(!fromCom && !toCom) { return; }
+        if(!(fromCom instanceof jQuery)) { fromCom = $('#' + fromCom); }
+        if(!(toCom instanceof jQuery)) { toCom = $('#' + toCom); }
+
         var fromX = parseInt(fromCom.css('transform').split(',')[4]) + 103;
         var fromY = parseInt(fromCom.css('transform').split(',')[5]) + 73;
 
@@ -234,13 +237,66 @@
     $('#btn-export').on('click', function(){
         //we already have componentsDB containing all the components
 		for (var cid in componentsDB) {
-			componentsDB[cid].transformMatrix = $('#' + cid).attr('style');
+			componentsDB[cid].transformMatrix = $('#' + cid).css('transform');
 		}
-		
+        $('#start-import').hide();
 		$('.full-mask .popup .ip-op').val(JSON.stringify(componentsDB));
 		showPopup({headerMsg: "Exported as JSON"});
 		//console.log(componentsDB);
     });
+    ////////////////////////////////////////////////////////
+
+
+    /*******************************************************
+    * IMPORTING / CREATING JSON
+    *******************************************************/
+    $('#btn-import').on('click', function() {        
+        $('.full-mask .popup .ip-op').val("");
+        $('#start-import').show();
+        showPopup({headerMsg: "Import JSON"});
+        //console.log(componentsDB);
+    });
+
+    $('#start-import').on('click', function(){
+        var importedComponentDB = JSON.parse($('.full-mask .popup .ip-op').val());
+        startImporting (importedComponentDB)
+        hidePopup();
+    });
+
+    function startImporting (importedComponentDB) {
+        var importedWiresDB = {};
+
+        // Draw The Components
+        for(var id in importedComponentDB) {
+            var newC = $('#clone-rec').clone();
+            var componentID = 'component-'+ (++componentCount);
+            newC.attr('id', componentID);
+            var cssTransformVal = importedComponentDB[id].transformMatrix;
+            newC.css('transform', cssTransformVal);
+            $('#main-svg').append(newC);
+
+            //add the component to componentsDB for future ref
+            componentsDB[componentID] = importedComponentDB[id];
+
+            // identify the wires
+            // populate importedWiresDB
+            for(var j in importedComponentDB[id].inConnectors) {
+                importedWiresDB[importedComponentDB[id].inConnectors[j]] = importedWiresDB[importedComponentDB[id].inConnectors[j]] || {};
+                importedWiresDB[importedComponentDB[id].inConnectors[j]].in = componentID;
+            }
+
+            for(var k in importedComponentDB[id].outConnectors) {
+                importedWiresDB[importedComponentDB[id].outConnectors[k]] = importedWiresDB[importedComponentDB[id].outConnectors[k]] || {};
+                importedWiresDB[importedComponentDB[id].outConnectors[k]].out = componentID;
+            }
+        }
+
+        // Draw The Wires
+        for(var i in importedWiresDB) {
+            drawConnectors(importedWiresDB[i].in, importedWiresDB[i].out);
+        }
+
+    }
     ////////////////////////////////////////////////////////
 	
 	
@@ -262,6 +318,10 @@
 		$('.full-mask .popup .header').text(popupCfg.headerMsg);
 		$('.full-mask').show();
 	}
+
+    function hidePopup () {
+        $('.full-mask').hide();
+    }
 	//////////////////////////////////////////////////////////
 
 //});
