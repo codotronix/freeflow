@@ -65,6 +65,9 @@ ul {
 	height: 225px;
 	resize: none;
 }
+.popup .btn-panel {
+    padding: 5px 10px;
+}
 #main-svg {
     height: 600px;
     width: 100%;
