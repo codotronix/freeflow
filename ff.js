@@ -141,11 +141,11 @@
             y2: toY,
             "data-ftid": ftid
         });
-
+        
         //update componentsDB
         componentsDB[fromID].outConnectors.push(connectorID);
         componentsDB[toID].inConnectors.push(connectorID);
-
+        
         $('#main-svg').prepend(newConnector);
     }
 
@@ -154,7 +154,7 @@
         var ftids;
         $('.connector').not('#clone-connector').each(function(){
             ftids = $(this).attr('data-ftid').split('---');
-            drawConnectors($('#' + ftids[0]), $('#' + ftids[1]));
+            drawConnectors(ftids[0], ftids[1]);
         });
     }
 
@@ -280,20 +280,27 @@
 
             // identify the wires
             // populate importedWiresDB
-            for(var j in importedComponentDB[id].inConnectors) {
-                importedWiresDB[importedComponentDB[id].inConnectors[j]] = importedWiresDB[importedComponentDB[id].inConnectors[j]] || {};
-                importedWiresDB[importedComponentDB[id].inConnectors[j]].in = componentID;
+            for(var j in componentsDB[componentID].inConnectors) {
+                importedWiresDB[componentsDB[componentID].inConnectors[j]] = importedWiresDB[componentsDB[componentID].inConnectors[j]] || {};
+                importedWiresDB[componentsDB[componentID].inConnectors[j]].in = componentID;
             }
 
-            for(var k in importedComponentDB[id].outConnectors) {
-                importedWiresDB[importedComponentDB[id].outConnectors[k]] = importedWiresDB[importedComponentDB[id].outConnectors[k]] || {};
-                importedWiresDB[importedComponentDB[id].outConnectors[k]].out = componentID;
+            for(var k in componentsDB[componentID].outConnectors) {
+                importedWiresDB[componentsDB[componentID].outConnectors[k]] = importedWiresDB[componentsDB[componentID].outConnectors[k]] || {};
+                importedWiresDB[componentsDB[componentID].outConnectors[k]].out = componentID;
             }
+
+            //Remove reference to OLD Wire IDs, 
+            //because wires are about to get new ids
+            componentsDB[componentID].inConnectors = [];
+            componentsDB[componentID].outConnectors = [];
         }
+
+
 
         // Draw The Wires
         for(var i in importedWiresDB) {
-            drawConnectors(importedWiresDB[i].in, importedWiresDB[i].out);
+            drawConnectors(importedWiresDB[i].out, importedWiresDB[i].in);
         }
 
     }
