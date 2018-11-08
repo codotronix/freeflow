@@ -24,7 +24,7 @@
     /*******************************************************
     * All the things related to ADDING COMPONENT
     *******************************************************/            
-    $('#add-component').click(function(){
+    $('.btn-add-component').click(function(){
         var newC = $('#clone-rec').clone();
         var componentID = 'component-'+ (++componentCount);
         newC.attr('id', componentID);
@@ -234,7 +234,7 @@
     /*******************************************************
     * EXPORTING / CREATING JSON
     *******************************************************/
-    $('#btn-export').on('click', function(){
+    $('.btn-export').on('click', function(){
         //we already have componentsDB containing all the components
 		for (var cid in componentsDB) {
 			componentsDB[cid].transformMatrix = $('#' + cid).css('transform');
@@ -250,7 +250,7 @@
     /*******************************************************
     * IMPORTING / CREATING JSON
     *******************************************************/
-    $('#btn-import').on('click', function() {        
+    $('.btn-import').on('click', function() {        
         $('.full-mask .popup .ip-op').val("");
         $('#start-import').show();
         showPopup({headerMsg: "Import JSON"});

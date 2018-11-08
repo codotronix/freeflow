@@ -4,6 +4,7 @@
     <title></title>
     <script src="lib/js/jquery-2.2.4.min.js"></script>
     <link href="lib/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="lib/css/fa-5.5/css/all.min.css" rel="stylesheet" />
     <link href="ff.css" rel="stylesheet" />
     <!-- <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" /> -->
     <style>
@@ -12,14 +13,22 @@
 </head>
 <body>
 
+    <!-- ********************* The LEFTBAR  ******************************************* -->
+    <div class="leftbar">
+        <i class="far fa-plus-square icon btn-add-component" title="Add component"></i>
+        <i class="fas fa-file-import icon btn-import" title="Import"></i>
+        <i class="fas fa-file-export icon btn-export" title="Export"></i>
+    </div>
+    <!-- ********************************************************************************** -->
+
 	<!-- ************************* TOP MENU REGION *************************************** -->
     <ul class="top-menu no-select">
         <li>
 			File
 			<ul class="sublist">
-                <li id="add-component">Add Component</li>
-                <li id="btn-export">Export</li>
-				<li id="btn-import">Import</li>
+                <li class="btn-add-component">Add Component</li>
+                <li class="btn-export">Export</li>
+				<li class="btn-import">Import</li>
             </ul>
 		</li>        
     </ul>
@@ -42,8 +51,8 @@
 	<!-- ********************* The DRAWING AREA ******************************************* -->
     <svg id="main-svg"></svg>
 	<!-- ********************************************************************************** -->
-	
-	
+    
+
 	<!-- ********************* The POPUP AREA ******************************************* -->
 	<div class="full-mask">
 		<div class="popup">
