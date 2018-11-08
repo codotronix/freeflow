@@ -24,6 +24,9 @@ ul {
     width: 100%;
     background: #eee;
 }
+.main-container {
+    padding: 0;
+}
 .full-mask {
 	position: fixed;
 	top: 0;
@@ -165,6 +168,7 @@ ul {
     top: 40px;
     bottom: 0;
     background: #2c6f2c;
+    transition: all 0.1s ease 0s;
 }
 .rightbar .btn-bar-collapser {
     position: absolute;
