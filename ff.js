@@ -331,4 +331,23 @@
     }
 	//////////////////////////////////////////////////////////
 
+
+    /*********************************************************
+    * RIGHTBAR RELATED
+    *********************************************************/
+
+    //expand / collapse rightbar
+    $('.rightbar .btn-bar-collapser').on('click', function () {
+        if ($('.rightbar').hasClass('collapsed')) {
+            $('.rightbar').removeClass('collapsed');
+        }
+        else {
+            $('.rightbar').addClass('collapsed');
+        }
+    });
+
+    //////////////////////////////////////////////////////////
+
+
+
 //});
