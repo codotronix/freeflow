@@ -117,7 +117,8 @@ ul {
 }
 
 .top-menu > li:hover {
-    background: #00f;
+    background: lightgreen;
+    color: #000;
 }
 
 .top-menu > li:hover .sublist {
@@ -131,15 +132,15 @@ ul {
     left: 0;
     top: 40px;
     width: 150px;
-    background: #000;
-    color: #d0e0ff;
+    background: lightgreen;
+    color: #000;
     z-index: 9999;
 }
 .top-menu .sublist li {
     padding: 5px 10px;
 }
 .top-menu .sublist li:hover {
-    background: #00f;
+    background: #fff;
 }
 .el.selected-el {
     stroke: blue;
@@ -204,4 +205,28 @@ ul {
 
 .rightbar.collapsed .btn-bar-collapser .left {
     display: block;
+}
+
+.prop-window {
+    background: lightgreen;
+}
+
+.prop-window .title-bar {
+    background: #27e64c;
+    color: #fff;
+    padding: 3px 7px 0;
+    font-size: 16px;
+}
+
+.prop-window .form-control {
+    padding: 3px 7px;
+    font-size: 12px;
+        height: 27px;
+}
+
+.prop-window .prop-name {
+    display: block;
+    padding-top: 15px;
+    font-weight: bold;
+    font-size: 12px;
 }
